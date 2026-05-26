@@ -398,6 +398,35 @@ export default function CloudDatabaseView({
                   placeholder="Masukkan ID Spreadsheet Google Anda (misal: 1zUxZaP77g...)"
                   className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 text-xs font-mono rounded-xl outline-none focus:bg-white focus:border-emerald-500 text-slate-700 transition-all shadow-inner"
                 />
+                {syncConfig.spreadsheetId && (syncConfig.spreadsheetId.trim().startsWith('AKfyc') || syncConfig.spreadsheetId.includes('script.google.com')) && (
+                  <div className="mt-2 bg-rose-50 p-3 rounded-2xl border border-rose-150 max-w-md space-y-2">
+                    <p className="text-[11px] text-rose-600 font-bold leading-normal">
+                      ⚠️ Salah Kolom: Anda memasukkan ID/URL Google Apps Script ({syncConfig.spreadsheetId.trim().substring(0, 15)}...) di kolom Google Spreadsheet ID.
+                    </p>
+                    <p className="text-[10px] text-slate-600 leading-normal">
+                      Kolom ini memerlukan <strong>ID Google Spreadsheet asli</strong> (didapat dari URL Google Sheet, bukan dari Apps Script). 
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const inputVal = syncConfig.spreadsheetId.trim();
+                        let appsScriptId = inputVal;
+                        if (inputVal.includes('macros/s/')) {
+                          appsScriptId = inputVal.split('macros/s/')[1].split('/')[0];
+                        }
+                        const fullUrl = `https://script.google.com/macros/s/${appsScriptId}/exec`;
+                        handleSaveSyncConfig({
+                          spreadsheetId: '',
+                          appsScriptUrl: fullUrl,
+                          autoSyncAppsScript: true
+                        });
+                      }}
+                      className="w-full bg-rose-600 hover:bg-rose-700 text-white font-extrabold text-[10px] py-1.5 px-3 rounded-xl shadow-sm transition-all flex items-center justify-center gap-1 cursor-pointer"
+                    >
+                      <span>💡 Pindahkan & Format Otomatis ke Web App URL di Bawah</span>
+                    </button>
+                  </div>
+                )}
                 {syncConfig.spreadsheetId && (
                   <div className="mt-1 flex items-center gap-1.5">
                     <a
@@ -524,6 +553,11 @@ export default function CloudDatabaseView({
                   placeholder="https://script.google.com/macros/s/AKfyby.../exec"
                   className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 text-xs font-mono rounded-xl outline-none focus:bg-white focus:border-purple-505 text-slate-700 transition-all shadow-inner"
                 />
+                {syncConfig.appsScriptUrl && !syncConfig.appsScriptUrl.startsWith('http') && syncConfig.appsScriptUrl.startsWith('AKfycb') && (
+                  <p className="text-[10px] text-rose-500 font-bold mt-1 bg-rose-50 p-2 rounded-lg border border-rose-150">
+                    ⚠️ Peringatan: Anda memasukkan ID Deployment saja. Kolom ini membutuhkan tautan Web App utuh, silakan ubah masukan Anda menjadi: <span className="font-mono text-[9px] block bg-white border border-rose-200 rounded p-1 mt-1 text-slate-600 select-all">https://script.google.com/macros/s/{syncConfig.appsScriptUrl}/exec</span>
+                  </p>
+                )}
                 <p className="text-[9px] text-slate-400 mt-1">Dapatkan link ini setelah mendeploy script yang disediakan sebagai Web App dengan hak akses "Anyone" (Siapa Saja).</p>
               </div>
 
